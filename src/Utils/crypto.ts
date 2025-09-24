@@ -143,7 +143,7 @@ export async function hkdf(
 	// Import the input key material
 	const importedKey = await subtle.importKey(
 		'raw',
-		inputKeyMaterial,
+		inputKeyMaterial as ArrayBuffer,
 		{ name: 'HKDF' },
 		false,
 		['deriveBits']
@@ -189,7 +189,7 @@ export async function derivePairingCodeKey(pairingCode: string, salt: Buffer): P
 			iterations: 2 << 16,
 			hash: 'SHA-256'
 		},
-		keyMaterial,
+		keyMaterial as ArrayBuffer,
 		32 * 8 // 32 bytes * 8 = 256 bits
 	)
 

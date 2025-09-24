@@ -87,7 +87,7 @@ export class WebhookService {
         event,
         status: response.status,
         deliveryId: delivery.id
-      });
+      } as any);
 
     } catch (error) {
       webhookLogger.error(`Webhook delivery failed`, {
@@ -95,7 +95,7 @@ export class WebhookService {
         url,
         event,
         error: error.message
-      });
+      } as any);
 
       // Handle retry logic
       await this.handleWebhookError(webhookId, url, event, payload, secret, error);
@@ -158,7 +158,7 @@ export class WebhookService {
           event,
           retryCount: webhook.retries + 1,
           retryDelay
-        });
+        } as any);
 
         // Schedule retry
         const timeoutId = setTimeout(() => {
@@ -190,7 +190,7 @@ export class WebhookService {
           url,
           event,
           maxRetries: webhook.maxRetries
-        });
+        } as any);
 
         // Mark delivery as failed
         const delivery = await this.dbService.client.webhookDelivery.findFirst({
@@ -274,14 +274,14 @@ export class WebhookService {
         webhookId,
         url: webhook.url,
         status: response.status
-      });
+      } as any);
 
       return response.status >= 200 && response.status < 300;
     } catch (error) {
       webhookLogger.error(`Webhook test failed`, {
         webhookId,
         error: error.message
-      });
+      } as any);
       return false;
     }
   }

@@ -44,7 +44,7 @@ export const makeChatsSocket = (config: SocketConfig) => {
 	})
 
 	if(!config.placeholderResendCache) {
-		config.placeholderResendCache = placeholderResendCache
+		config.placeholderResendCache = placeholderResendCache as any
 	}
 
 	/** helper function to fetch the given app state sync key */
@@ -923,7 +923,7 @@ export const makeChatsSocket = (config: SocketConfig) => {
 				msg,
 				{
 					shouldProcessHistoryMsg,
-					placeholderResendCache,
+					placeholderResendCache: placeholderResendCache as any,
 					ev,
 					creds: authState.creds,
 					keyStore: authState.keys,

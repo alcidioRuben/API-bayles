@@ -152,7 +152,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 		const msgId = msgKey.id!
 
 		const key = `${msgId}:${msgKey?.participant}`
-		let retryCount = msgRetryCache.get<number>(key) || 0
+		let retryCount = (msgRetryCache.get<number>(key) as number) || 0
 		if(retryCount >= maxMsgRetryCount) {
 			logger.debug({ retryCount, msgId }, 'reached retry limit, clearing')
 			msgRetryCache.del(key)
@@ -206,7 +206,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 					receipt.attrs.participant = node.attrs.participant
 				}
 
-				if(retryCount > 1 || forceIncludeKeys) {
+				if((retryCount as number) > 1 || forceIncludeKeys) {
 					const { update, preKeys } = await getNextPreKeys(authState, 1)
 
 					const [keyId] = Object.keys(preKeys)
@@ -551,13 +551,13 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 
 	const willSendMessageAgain = (id: string, participant: string) => {
 		const key = `${id}:${participant}`
-		const retryCount = msgRetryCache.get<number>(key) || 0
+		const retryCount = (msgRetryCache.get<number>(key) as number) || 0
 		return retryCount < maxMsgRetryCount
 	}
 
 	const updateSendMessageAgainCount = (id: string, participant: string) => {
 		const key = `${id}:${participant}`
-		const newValue = (msgRetryCache.get<number>(key) || 0) + 1
+		const newValue = ((msgRetryCache.get<number>(key) as number) || 0) + 1
 		msgRetryCache.set(key, newValue)
 	}
 
@@ -936,8 +936,8 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 
 		// use existing call info to populate this event
 		if(existingCall) {
-			call.isVideo = existingCall.isVideo
-			call.isGroup = existingCall.isGroup
+			(call as any).isVideo = (existingCall as any).isVideo
+			(call as any).isGroup = (existingCall as any).isGroup
 		}
 
 		// delete data once call has ended

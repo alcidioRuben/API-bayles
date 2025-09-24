@@ -149,7 +149,7 @@ export class WhatsAppService {
 
     const { connection, lastDisconnect, qr } = update;
 
-    whatsappLogger.info(`Connection update for ${sessionId}:`, { connection, lastDisconnect: lastDisconnect?.error?.message });
+    whatsappLogger.info(`Connection update for ${sessionId}:`, { connection, lastDisconnect: lastDisconnect?.error?.message } as any);
 
     if (qr) {
       // Generate QR code
