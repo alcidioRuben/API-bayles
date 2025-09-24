@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { logger } from '../utils/apiLogger';
+import { logger } from '../Utils/apiLogger';
 
 export class DatabaseService {
   private prisma: PrismaClient;
@@ -27,8 +27,10 @@ export class DatabaseService {
     });
 
     // Log database queries in development
+    // Note: Prisma $on events are deprecated in newer versions
+    /*
     if (process.env.NODE_ENV === 'development') {
-      this.prisma.$on('query', (e) => {
+      this.prisma.$on('query', (e: any) => {
         logger.debug({
           query: e.query,
           params: e.params,
@@ -37,26 +39,27 @@ export class DatabaseService {
       });
     }
 
-    this.prisma.$on('error', (e) => {
+    this.prisma.$on('error', (e: any) => {
       logger.error({
         target: e.target,
         message: e.message
       }, 'Database Error');
     });
 
-    this.prisma.$on('info', (e) => {
+    this.prisma.$on('info', (e: any) => {
       logger.info({
         target: e.target,
         message: e.message
       }, 'Database Info');
     });
 
-    this.prisma.$on('warn', (e) => {
+    this.prisma.$on('warn', (e: any) => {
       logger.warn({
         target: e.target,
         message: e.message
       }, 'Database Warning');
     });
+    */
   }
 
   async connect() {
@@ -371,10 +374,10 @@ export class DatabaseService {
           status: 'CONNECTED' 
         } 
       }),
-      this.prisma.message.count({ where }),
+      this.prisma.message.count({ where: userId ? { session: { userId } } : {} }),
       this.prisma.message.count({
         where: {
-          ...where,
+          ...(userId ? { session: { userId } } : {}),
           timestamp: {
             gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
           }

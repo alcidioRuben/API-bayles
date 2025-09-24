@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { ValidationError } from 'express-validator';
 import { Boom } from '@hapi/boom';
-import { logger } from '../utils/apiLogger';
-import { ApiError } from '../types/api';
+import { logger } from '../Utils/apiLogger';
+import { ApiError } from '../Types/api';
 
 export const errorHandler = (
   error: Error | ApiError | Boom,
@@ -125,11 +125,11 @@ export const handleValidationErrors = (
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const validationErrors = errors.array().map((error: ValidationError) => ({
-      field: error.param,
-      message: error.msg,
+    const validationErrors = errors.array().map((error: any) => ({
+      field: error.param || error.path,
+      message: error.msg || error.message,
       value: error.value,
-      location: error.location
+      location: error.location || error.path
     }));
 
     return res.status(400).json({

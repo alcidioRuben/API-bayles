@@ -13,10 +13,10 @@ import { Boom } from '@hapi/boom';
 import QRCode from 'qrcode';
 import { join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
-import { logger, whatsappLogger } from '../utils/apiLogger';
+import { logger, whatsappLogger } from '../Utils/apiLogger';
 import { DatabaseService } from './DatabaseService';
 import { WebhookService } from './WebhookService';
-import { WhatsAppSession, SessionStatus } from '../types/api';
+import { WhatsAppSession, SessionStatus } from '../Types/api';
 
 export class WhatsAppService {
   private sessions: Map<string, WhatsAppSession> = new Map();
@@ -432,7 +432,7 @@ export class WhatsAppService {
   async deleteSession(sessionId: string): Promise<void> {
     const session = this.sessions.get(sessionId);
     if (session?.socket) {
-      session.socket.end();
+      session.socket.end(undefined);
     }
     this.sessions.delete(sessionId);
     await this.dbService.deleteSession(sessionId);
@@ -476,7 +476,7 @@ export class WhatsAppService {
     for (const [sessionId, session] of this.sessions) {
       if (session.socket) {
         try {
-          session.socket.end();
+          session.socket.end(undefined);
         } catch (error) {
           whatsappLogger.error(`Error closing session ${sessionId}:`, error);
         }

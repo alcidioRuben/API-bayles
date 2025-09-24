@@ -4,7 +4,7 @@ import { handleValidationErrors, asyncHandler } from '../middleware/errorHandler
 import { sessionMiddleware } from '../middleware/auth';
 import { whatsAppService } from '../app';
 import { DatabaseService } from '../services/DatabaseService';
-import { ApiResponse, SessionStatus } from '../types/api';
+import { ApiResponse, SessionStatus } from '../Types/api';
 
 const router = Router();
 const dbService = new DatabaseService();
@@ -25,15 +25,15 @@ router.get('/', asyncHandler(async (req, res) => {
   const sessions = await dbService.getUserSessions(req.user!.id);
   
   // Enhance with real-time status from WhatsApp service
-  const enhancedSessions = sessions.map(session => {
-    const liveSession = whatsAppService.getSession(session.sessionId);
+  const enhancedSessions = await Promise.all(sessions.map(async session => {
+    const liveSession = await whatsAppService.getSession(session.sessionId);
     return {
       ...session,
       liveStatus: liveSession?.status || SessionStatus.DISCONNECTED,
       qrCode: liveSession?.qrCode,
       pairingCode: liveSession?.pairingCode
     };
-  });
+  }));
 
   res.json({
     success: true,

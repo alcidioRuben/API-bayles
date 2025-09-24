@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { handleValidationErrors, asyncHandler } from '../middleware/errorHandler';
 import { authMiddleware, AuthenticatedRequest } from '../middleware/auth';
-import { ApiResponse } from '../types/api';
+import { ApiResponse } from '../Types/api';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -86,7 +86,7 @@ router.post('/register', [
   const token = jwt.sign(
     { userId: user.id },
     process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } as jwt.SignOptions
   );
 
   res.status(201).json({
@@ -160,7 +160,7 @@ router.post('/login', [
   const token = jwt.sign(
     { userId: user.id },
     process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } as jwt.SignOptions
   );
 
   res.json({
