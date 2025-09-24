@@ -22,8 +22,17 @@ export const downloadHistory = async(
 
 	let buffer = Buffer.concat(bufferArray)
 
-	// decompress buffer
-	buffer = await inflatePromise(buffer) as Buffer
+	// decompress buffer with proper type handling
+	try {
+		console.log('Decompressing buffer, size:', buffer.length)
+		const decompressed = await inflatePromise(buffer)
+		// Force proper Buffer type conversion
+		buffer = Buffer.from(decompressed instanceof Uint8Array ? decompressed : new Uint8Array(decompressed))
+		console.log('Buffer decompressed successfully, new size:', buffer.length)
+	} catch (error) {
+		console.error('Error decompressing buffer:', error)
+		throw error
+	}
 
 	const syncData = proto.HistorySync.decode(buffer)
 	return syncData
