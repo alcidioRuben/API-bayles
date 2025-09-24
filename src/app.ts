@@ -100,12 +100,40 @@ app.use(limiter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0'
-  });
+app.get('/health', async (req, res) => {
+  try {
+    // Basic health check
+    const healthStatus: any = {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      version: process.env.npm_package_version || '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      port: process.env.PORT || 3001
+    };
+
+    // Try to check database connection if available
+    try {
+      if (databaseService) {
+        await databaseService.healthCheck();
+        healthStatus.database = 'connected';
+      }
+    } catch (dbError) {
+      console.error('Database health check failed:', dbError);
+      healthStatus.database = 'disconnected';
+      healthStatus.status = 'degraded';
+    }
+
+    res.status(200).json(healthStatus);
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(503).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      error: 'Service unavailable'
+    });
+  }
 });
 
 // Routes
@@ -144,6 +172,18 @@ io.on('connection', (socket) => {
 const databaseService = new DatabaseService();
 const whatsAppService = new WhatsAppService(io);
 
+// Initialize database connection
+async function initializeServices() {
+  try {
+    console.log('Initializing database connection...');
+    await databaseService.connect();
+    console.log('Database connected successfully');
+  } catch (error) {
+    console.error('Failed to connect to database:', error);
+    // Don't exit the process, let the health check handle it
+  }
+}
+
 // Export for use in routes
 
 // Graceful shutdown
@@ -169,10 +209,26 @@ process.on('SIGINT', async () => {
 
 const PORT = process.env.PORT || 3001;
 
-server.listen(PORT, () => {
-  logger.info(`Server running on port ${PORT}`);
-  logger.info(`API Documentation available at http://localhost:${PORT}/api-docs`);
-  logger.info(`Dashboard available at http://localhost:${PORT}/dashboard`);
-});
+// Start the server
+async function startServer() {
+  try {
+    // Initialize services first
+    await initializeServices();
+    
+    // Start the HTTP server
+    server.listen(PORT, () => {
+      logger.info(`Server running on port ${PORT}`);
+      logger.info(`API Documentation available at http://localhost:${PORT}/api-docs`);
+      logger.info(`Dashboard available at http://localhost:${PORT}/dashboard`);
+      logger.info(`Health check available at http://localhost:${PORT}/health`);
+    });
+  } catch (error) {
+    logger.error('Failed to start server:', error);
+    process.exit(1);
+  }
+}
+
+// Start the application
+startServer();
 
 export { app, io, whatsAppService };

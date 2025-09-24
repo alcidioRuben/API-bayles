@@ -11,7 +11,8 @@ RUN apk add --no-cache \
     pango-dev \
     giflib-dev \
     librsvg-dev \
-    pixman-dev
+    pixman-dev \
+    curl
 
 # Set working directory
 WORKDIR /app
@@ -34,5 +35,9 @@ RUN npm run build
 # Expose port
 EXPOSE 3001
 
-# Start command
-CMD ["npm", "run", "migrate:deploy", "&&", "npm", "start"]
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3001/health || exit 1
+
+# Start command with proper error handling
+CMD ["sh", "-c", "echo 'Starting application...' && npm run migrate:deploy && echo 'Database migrations completed' && npm start"]

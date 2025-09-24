@@ -82,6 +82,17 @@ export class DatabaseService {
     }
   }
 
+  async healthCheck() {
+    try {
+      // Simple query to check database connectivity
+      await this.prisma.$queryRaw`SELECT 1`;
+      return true;
+    } catch (error) {
+      logger.error('Database health check failed:', error);
+      throw error;
+    }
+  }
+
   // User operations
   async createUser(data: {
     email: string;
