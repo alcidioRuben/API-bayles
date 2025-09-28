@@ -1,0 +1,12 @@
+import pino from 'pino';
+export declare const logger: import("pino").Logger<never, boolean>;
+export declare const createLogger: (component: string) => pino.Logger<never, boolean>;
+export declare const apiLogger: pino.Logger<never, boolean>;
+export declare const whatsappLogger: pino.Logger<never, boolean>;
+export declare const dbLogger: pino.Logger<never, boolean>;
+export declare const webhookLogger: pino.Logger<never, boolean>;
+export declare const logApiRequest: (req: any, res: any, duration: number) => void;
+export declare const logWhatsAppEvent: (sessionId: string, event: string, data?: any) => void;
+export declare const logError: (error: Error, context?: any) => void;
+export declare const logWebhookDelivery: (webhookId: string, url: string, event: string, status: string, response?: any) => void;
+export default logger;

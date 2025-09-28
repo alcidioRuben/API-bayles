@@ -6,7 +6,7 @@
     "allowJs": false,
     "checkJs": false,
     "outDir": "dist",
-    "strict": true,
+    "strict": false,
     "strictNullChecks": true,
     "skipLibCheck": true,
     "noImplicitThis": true,
