@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:16-alpine3.16
 
 # Install git and other build dependencies
 RUN apk add --no-cache \
@@ -12,8 +12,7 @@ RUN apk add --no-cache \
     giflib-dev \
     librsvg-dev \
     pixman-dev \
-    curl \
-    openssl1.1-compat
+    curl
 
 # Set working directory
 WORKDIR /app
