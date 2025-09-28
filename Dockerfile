@@ -1,4 +1,4 @@
-FROM node:16-alpine3.16
+FROM node:22-alpine
 
 # Install git and other build dependencies
 RUN apk add --no-cache \
@@ -13,6 +13,11 @@ RUN apk add --no-cache \
     librsvg-dev \
     pixman-dev \
     curl
+
+# Configurar variável de ambiente para forçar o Prisma a usar OpenSSL 3.0
+ENV PRISMA_CLI_QUERY_ENGINE_TYPE=binary
+ENV PRISMA_CLIENT_ENGINE_TYPE=binary
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 # Set working directory
 WORKDIR /app
