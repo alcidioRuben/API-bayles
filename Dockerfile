@@ -12,7 +12,8 @@ RUN apk add --no-cache \
     giflib-dev \
     librsvg-dev \
     pixman-dev \
-    curl
+    curl \
+    openssl1.1-compat
 
 # Set working directory
 WORKDIR /app
